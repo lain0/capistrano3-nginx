@@ -1,10 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'capistrano/nginx/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'capistrano3-nginx'
-  spec.version       = '2.1.6'
+  spec.version       = Capistrano::NGINX_VERSION
   spec.authors       = ['Juan Ignacio Donoso']
   spec.email         = ['jidonoso@gmail.com']
   spec.description   = %q{Adds suuport to nginx for Capistrano 3.x}
@@ -17,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'capistrano', '>= 3.0.0'
+  spec.add_dependency 'capistrano', '~> 3.0'
 
-  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'rake', '~> 0'
 end

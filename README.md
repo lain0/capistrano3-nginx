@@ -1,19 +1,12 @@
-# Capistrano::Nginx [![Gem Version](https://badge.fury.io/rb/capistrano3-nginx.svg)](http://badge.fury.io/rb/capistrano3-nginx)
 
-# UNMAINTAINED NOTICE
-
-We stopped using capistrano to deploy our applicacions, so this project is not longer maintained.
-
-<hr />
-
-Nginx support for Capistrano 3.x
+Nginx support for Capistrano 3.x, with sudo prompt
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'capistrano3-nginx', '~> 2.0'
-    gem 'capistrano'
+    gem 'capistrano3-nginx', '~> 3.0'
+
 
 And then execute:
 
@@ -29,7 +22,10 @@ Require in `Capfile` to use the default task:
 
 ```ruby
 require 'capistrano/nginx'
+install_plugin Capistrano::Nginx
 ```
+
+
 
 You will get the following tasks
 
@@ -74,8 +70,8 @@ set :nginx_redirected_domains, "bar.com other.com"
 set :nginx_service_path, "/etc/init.d/nginx"
 
 # Roles the deploy nginx site on,
-# default value: :web
-set :nginx_roles, :web
+# default value: :sudo
+set :nginx_roles, :sudo
 
 # Path, where nginx log file will be stored
 # default value:  "#{shared_path}/log"
@@ -148,22 +144,3 @@ set :app_server_port, 8080
 ## Thanks
 Thansk for the inspiration on several nginx recipes out there
 
-## Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
-
-## Credits
-
-Thank you [contributors](https://github.com/platanus/guides/graphs/contributors)!
-
-<img src="http://platan.us/gravatar_with_text.png" alt="Platanus" width="250"/>
-
-capistrano3-nginx is maintained by [platanus](http://platan.us).
-
-## License
-
-Guides is © 2014 platanus, spa. It is free software and may be redistributed under the terms specified in the LICENSE file.

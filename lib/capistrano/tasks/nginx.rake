@@ -1,52 +1,14 @@
-namespace :load do
-  task :defaults do
-    set :nginx_sudo_paths,          -> { [:nginx_log_path, :nginx_sites_enabled_dir, :nginx_sites_available_dir] }
-    set :nginx_sudo_tasks,          -> { ['nginx:start', 'nginx:stop', 'nginx:restart', 'nginx:reload', 'nginx:configtest', 'nginx:site:add', 'nginx:site:disable', 'nginx:site:enable', 'nginx:site:remove' ] }
-    set :nginx_log_path,            -> { "#{shared_path}/log" }
-    set :nginx_service_path,        -> { 'service nginx' }
-    set :nginx_static_dir,          -> { "public" }
-    set :nginx_application_name,    -> { fetch(:application) }
-    set :nginx_sites_enabled_dir,   -> { "/etc/nginx/sites-enabled" }
-    set :nginx_sites_available_dir, -> { "/etc/nginx/sites-available" }
-    set :nginx_roles,               -> { :web }
-    set :nginx_template,            -> { :default }
-    set :nginx_use_ssl,             -> { false }
-    set :nginx_ssl_certificate,          -> { "#{fetch(:application)}.crt" }
-    set :nginx_ssl_certificate_path,     -> { '/etc/ssl/certs' }
-    set :nginx_ssl_certificate_key,      -> { "#{fetch(:application)}.key" }
-    set :nginx_ssl_certificate_key_path, -> { '/etc/ssl/private' }
-    set :app_server,                     -> { true }
-  end
-end
+git_plugin = self
 
 namespace :nginx do
-
-  # prepend :sudo to list if arguments if :key is in :nginx_use_sudo_for list
-  def add_sudo_if_required argument_list, *keys
-    keys.each do | key |
-      if nginx_use_sudo? key
-        argument_list.unshift(:sudo)
-        break
-      end
-    end
-  end
-
-  def nginx_use_sudo? key
-    return (fetch(:nginx_sudo_tasks).include?(key) || fetch(:nginx_sudo_paths).include?(key))
-  end
-
-  def valid_nginx_config?
-    test_sudo = nginx_use_sudo?('nginx:configtest') ? 'sudo ' : ''
-    nginx_service = fetch(:nginx_service_path)
-    test "[ $(#{test_sudo}#{nginx_service} configtest | grep -c 'fail') -eq 0 ]"
-  end
-
   task :load_vars do
     set :sites_available,       -> { fetch(:nginx_sites_available_dir) }
     set :sites_enabled,         -> { fetch(:nginx_sites_enabled_dir) }
     set :enabled_application,   -> { File.join(fetch(:sites_enabled),   fetch(:nginx_application_name)) }
     set :available_application, -> { File.join(fetch(:sites_available), fetch(:nginx_application_name)) }
   end
+
+
 
   # validate_sudo_settings
   task :validate_user_settings do
@@ -64,7 +26,11 @@ namespace :nginx do
   desc "Configtest nginx service"
   task :configtest do
     on release_roles fetch(:nginx_roles) do
-      abort("nginx configuration is invalid! (Make sure nginx configuration files are readable and correctly formated.)") unless valid_nginx_config?
+      nginx_service = fetch(:nginx_service_path)
+      execute(
+          "sudo #{nginx_service} configtest",
+          interaction_handler: PasswdInteractionHandler.new
+      )
     end
   end
 
@@ -73,8 +39,8 @@ namespace :nginx do
     task command => ['nginx:validate_user_settings'] do
       on release_roles fetch(:nginx_roles) do
         arguments = fetch(:nginx_service_path), command
-        add_sudo_if_required arguments, "nginx:#{command}"
-        execute *arguments
+        git_plugin.add_sudo_if_required arguments, "nginx:#{command}"
+        execute *arguments, interaction_handler: PasswdInteractionHandler.new
       end
     end
     before "nginx:#{command}", 'nginx:configtest' unless command == 'stop'
@@ -84,7 +50,7 @@ namespace :nginx do
     on release_roles fetch(:nginx_roles) do
       arguments = :mkdir, '-pv', fetch(:nginx_log_path)
       add_sudo_if_required arguments, :nginx_log_path
-      execute *arguments
+      execute *arguments, interaction_handler: PasswdInteractionHandler.new
     end
   end
   after 'deploy:check', 'nginx:create_log_paths'
@@ -110,7 +76,7 @@ namespace :nginx do
           config = ERB.new(File.read(config_file)).result(binding)
           upload! StringIO.new(config), '/tmp/nginx.conf'
           arguments = :mv, '/tmp/nginx.conf', fetch(:nginx_application_name)
-          add_sudo_if_required arguments, 'nginx:sites:add', :nginx_sites_available_dir
+          git_plugin.add_sudo_if_required arguments, 'nginx:sites:add', :nginx_sites_available_dir
           execute *arguments
         end
       end
@@ -122,7 +88,7 @@ namespace :nginx do
         if test "! [ -h #{fetch(:enabled_application)} ]"
           within fetch(:sites_enabled) do
             arguments = :ln, '-nfs', fetch(:available_application), fetch(:enabled_application)
-            add_sudo_if_required arguments, 'nginx:sites:enable', :nginx_sites_enabled_dir
+            git_plugin.add_sudo_if_required arguments, 'nginx:sites:enable', :nginx_sites_enabled_dir
             execute *arguments
           end
         end
@@ -135,7 +101,7 @@ namespace :nginx do
         if test "[ -f #{fetch(:enabled_application)} ]"
           within fetch(:sites_enabled) do
             arguments = :rm, '-f', fetch(:nginx_application_name)
-            add_sudo_if_required arguments, 'nginx:sites:disable', :nginx_sites_enabled_dir
+            git_plugin.add_sudo_if_required arguments, 'nginx:sites:disable', :nginx_sites_enabled_dir
             execute *arguments
           end
         end
@@ -148,11 +114,12 @@ namespace :nginx do
         if test "[ -f #{fetch(:available_application)} ]"
           within fetch(:sites_available) do
             arguments = :rm, fetch(:nginx_application_name)
-            add_sudo_if_required arguments, 'nginx:sites:remove', :nginx_sites_available_dir
+            git_plugin.add_sudo_if_required arguments, 'nginx:sites:remove', :nginx_sites_available_dir
             execute *arguments
           end
         end
       end
     end
   end
+
 end
