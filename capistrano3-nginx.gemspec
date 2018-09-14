@@ -6,11 +6,10 @@ require 'capistrano/nginx/version'
 Gem::Specification.new do |spec|
   spec.name          = 'capistrano3-nginx'
   spec.version       = Capistrano::NGINX_VERSION
-  spec.authors       = ['Juan Ignacio Donoso']
-  spec.email         = ['jidonoso@gmail.com']
+  spec.authors       = ['Juan Ignacio Donoso', 'treenewbee']
   spec.description   = %q{Adds suuport to nginx for Capistrano 3.x}
   spec.summary       = %q{Adds suuport to nginx for Capistrano 3.x}
-  spec.homepage      = 'https://github.com/platanus/capistrano3-nginx'
+  spec.homepage      = 'https://github.com/treenewbee/capistrano3-nginx'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)
