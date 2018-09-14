@@ -1,5 +1,5 @@
 
-Nginx support for Capistrano 3.x, with sudo prompt
+Nginx support for Capistrano 3.x, with sudo password prompt
 
 ## Installation
 
@@ -25,7 +25,19 @@ require 'capistrano/nginx'
 install_plugin Capistrano::Nginx
 ```
 
+Make sure pty is enabled in deploy.rb
 
+```ruby
+set :pty, true
+```
+
+Make sure server has sudo role
+
+```ruby
+server 'example.com',
+  user: 'with_sudo_access',
+  roles: %w{sudo}
+```  
 
 You will get the following tasks
 
