@@ -49,7 +49,7 @@ namespace :nginx do
   task :create_log_paths do
     on release_roles fetch(:nginx_roles) do
       arguments = :mkdir, '-pv', fetch(:nginx_log_path)
-      add_sudo_if_required arguments, :nginx_log_path
+      git_plugin.add_sudo_if_required arguments, :nginx_log_path
       execute *arguments, interaction_handler: PasswdInteractionHandler.new
     end
   end
