@@ -7,7 +7,7 @@ module Capistrano
       set :nginx_sudo_tasks,          -> { ['nginx:start', 'nginx:stop', 'nginx:restart', 'nginx:reload', 'nginx:configtest', 'nginx:site:add', 'nginx:site:disable', 'nginx:site:enable', 'nginx:site:remove' ] }
       set :nginx_log_path,            -> { "#{shared_path}/log" }
       set :nginx_service_path,        -> { 'service nginx' }
-      set :nginx_static_dir,          -> { "#{shared_path}/public/assets" }
+      set :nginx_static_dir,          -> { "public" }
       set :nginx_application_name,    -> { fetch(:application) }
       set :nginx_sites_enabled_dir,   -> { "/etc/nginx/sites-enabled" }
       set :nginx_sites_available_dir, -> { "/etc/nginx/sites-available" }
