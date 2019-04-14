@@ -54,6 +54,11 @@ server {
   client_max_body_size 4G;
   keepalive_timeout 10;
 
+<% if fetch(:nginx_auth_basic_user_file) %>
+  auth_basic "Restricted Area";
+  auth_basic_user_file <%= fetch(:nginx_auth_basic_user_file) %>;
+<% end %>
+
 <% if fetch(:app_server) && (fetch(:app_server_socket) || fetch(:app_server_port))%>
   location ^~ /assets/ {
     gzip_static on;
