@@ -1,3 +1,3 @@
 module Capistrano
-  NGINX_VERSION = '3.0.2'
+  NGINX_VERSION = '3.0.3'
 end

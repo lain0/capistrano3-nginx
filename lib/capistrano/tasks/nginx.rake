@@ -59,7 +59,9 @@ namespace :nginx do
   task :gzip_static => ['nginx:load_vars'] do
     on release_roles fetch(:nginx_roles) do
       within release_path do
-        execute :find, "'#{fetch(:nginx_static_dir)}' -type f -name '*.js' -o -name '*.css' -exec gzip -v -9 -f -k {} \\;"
+        arguments = :find, "'#{fetch(:nginx_static_dir)}' -type f -name '*.js' -o -name '*.css' -exec gzip -v -9 -f -k {} \\;"
+        git_plugin.add_sudo_if_required arguments, :gzip_static
+        execute *arguments, interaction_handler: PasswdInteractionHandler.new
       end
     end
   end
@@ -71,13 +73,13 @@ namespace :nginx do
         within fetch(:sites_available) do
           config_file = fetch(:nginx_template)
           if config_file == :default
-              config_file = File.expand_path('../../../../templates/nginx.conf.erb', __FILE__)
+            config_file = File.expand_path('../../../../templates/nginx.conf.erb', __FILE__)
           end
           config = ERB.new(File.read(config_file)).result(binding)
           upload! StringIO.new(config), '/tmp/nginx.conf'
           arguments = :mv, '/tmp/nginx.conf', fetch(:nginx_application_name)
           git_plugin.add_sudo_if_required arguments, 'nginx:sites:add', :nginx_sites_available_dir
-          execute *arguments
+          execute *arguments, interaction_handler: PasswdInteractionHandler.new
         end
       end
     end
@@ -89,7 +91,7 @@ namespace :nginx do
           within fetch(:sites_enabled) do
             arguments = :ln, '-nfs', fetch(:available_application), fetch(:enabled_application)
             git_plugin.add_sudo_if_required arguments, 'nginx:sites:enable', :nginx_sites_enabled_dir
-            execute *arguments
+            execute *arguments, interaction_handler: PasswdInteractionHandler.new
           end
         end
       end
@@ -102,7 +104,7 @@ namespace :nginx do
           within fetch(:sites_enabled) do
             arguments = :rm, '-f', fetch(:nginx_application_name)
             git_plugin.add_sudo_if_required arguments, 'nginx:sites:disable', :nginx_sites_enabled_dir
-            execute *arguments
+            execute *arguments, interaction_handler: PasswdInteractionHandler.new
           end
         end
       end
@@ -115,7 +117,7 @@ namespace :nginx do
           within fetch(:sites_available) do
             arguments = :rm, fetch(:nginx_application_name)
             git_plugin.add_sudo_if_required arguments, 'nginx:sites:remove', :nginx_sites_available_dir
-            execute *arguments
+            execute *arguments, interaction_handler: PasswdInteractionHandler.new
           end
         end
       end
