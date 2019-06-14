@@ -5,7 +5,7 @@ Nginx support for Capistrano 3.x, with sudo password prompt
 
 Add this line to your application's Gemfile:
 
-    gem 'capistrano3-nginx', '~> 3.0.2'
+    gem 'capistrano3-nginx', '~> 3.0.3'
 
 
 And then execute:
