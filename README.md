@@ -5,7 +5,7 @@ Nginx support for Capistrano 3.x, with sudo password prompt
 
 Add this line to your application's Gemfile:
 
-    gem 'capistrano3-nginx', '~> 3.0'
+    gem 'capistrano3-nginx', '~> 3.0.2'
 
 
 And then execute:
@@ -41,6 +41,10 @@ server 'example.com',
 
 You will get the following tasks
 
+```sh
+cap -T | grep "cap nginx"
+```
+
 ```ruby
 cap nginx:start                    # Start nginx service
 cap nginx:stop                     # Stop nginx service
@@ -51,7 +55,11 @@ cap nginx:site:disable             # Disables the site removing the symbolic lin
 cap nginx:site:enable              # Enables the site creating a symbolic link into the enabled folder
 cap nginx:site:remove              # Removes the site removing the configuration file from the available folder
 cap nginx:gzip_static              # Compress all js and css files in :nginx_static_dir with gzip
+cap nginx:configtest               # Configtest nginx service
 ```
+
+
+
 
 Configurable options (copy into deploy.rb), shown here with examples:
 
