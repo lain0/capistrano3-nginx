@@ -53,7 +53,7 @@ namespace :nginx do
       execute *arguments, interaction_handler: PasswdInteractionHandler.new
     end
   end
-  after 'deploy:check', 'nginx:create_log_paths'
+  after 'deploy:check', 'nginx:create_log_paths' if fetch(:nginx_log_path)
 
   desc 'Compress JS and CSS with gzip'
   task :gzip_static => ['nginx:load_vars'] do

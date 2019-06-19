@@ -5,7 +5,7 @@ Nginx support for Capistrano 3.x, with sudo password prompt
 
 Add this line to your application's Gemfile:
 
-    gem 'capistrano3-nginx', '~> 3.0.3'
+    gem 'capistrano3-nginx', '~> 3.0.4'
 
 
 And then execute:
@@ -94,8 +94,9 @@ set :nginx_service_path, "/etc/init.d/nginx"
 set :nginx_roles, :sudo
 
 # Path, where nginx log file will be stored
+# set it nil if don't want to override log path 
 # default value:  "#{shared_path}/log"
-# set :nginx_log_path, "#{shared_path}/log"
+set :nginx_log_path, nil
 
 # Path where to look for static files
 # default value: "public"
