@@ -110,7 +110,7 @@ set :nginx_sites_available_dir, "/opt/nginx/sites-available"
 # default value: "#{fetch :application}"
 set :nginx_application_name, "#{fetch :application}-#{fetch :stage}"
 
-# Path where nginx available site are stored
+# Path where nginx enabled site are stored
 # default value: "/etc/nginx/sites-enabled"
 set :nginx_sites_enabled_dir, "/opt/nginx/sites-enabled"
 
