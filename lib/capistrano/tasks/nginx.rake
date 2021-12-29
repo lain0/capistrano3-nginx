@@ -23,12 +23,11 @@ namespace :nginx do
     end
   end
 
-  desc "Configtest nginx service"
+  desc "Configtest nginx"
   task :configtest do
     on release_roles fetch(:nginx_roles) do
-      nginx_service = fetch(:nginx_service_path)
       execute(
-          "sudo #{nginx_service} configtest",
+          "sudo nginx -t",
           interaction_handler: PasswdInteractionHandler.new
       )
     end
